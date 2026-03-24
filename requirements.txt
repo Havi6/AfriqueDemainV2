@@ -1,0 +1,20 @@
+uliweb-alembic
+starlette
+fastapi[standard]
+uvicorn[standard]
+sqlalchemy         #gestion des models de base de donnée
+databases          #gestion des 
+psycopg2-binary    # PostgreSQL
+aiosqlite          # SQLite en dev
+python-jose[cryptography]
+passlib[bcrypt]
+redis
+websockets
+pydantic-settings
+alembic
+pydantic[email]
+argon2_cffi
+python-multipart
+psycopg2-binary
+asyncpg
+supabase

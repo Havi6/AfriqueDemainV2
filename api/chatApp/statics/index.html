@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login page</title>
+</head>
+
+<body>
+    <header>
+        <h1>Welcome</h1>
+    </header>
+    <div>
+        <section>
+            <h2>Inscription</h2>
+            <input id="reg_user" placeholder="username">
+            <input id="reg_email" type="email" placeholder="email">
+            <input id="reg_pass" type="password" placeholder="password">
+            <button onclick="register()">Register</button>
+        </section>
+
+        <form id="connexion">
+            <h2>Connexion</h2>
+            <input id="email" type="email" placeholder="email">
+            <input id="password" type="password" placeholder="password">
+            <button type="submit" onclick="login()">Login</button>
+        </form>
+    </div>
+</body>
+<footer>
+    <script>
+        // static/client_fastapi.js
+        let ws = null;
+        let access_token = localStorage.getItem("access_token");
+        let refresh_token = localStorage.getItem("refresh_token");
+
+
+        function setToken(t, r) {
+            access_token = t; refresh_token = r;
+            localStorage.setItem("access_token", t);
+            localStorage.setItem("refresh_token", r);
+        }
+        const mail = document.getElementbyId("email").value
+        const pass = document.getElementbyId("password").value
+        const loginData = {
+             email: mail,
+             password: pass
+        };
+
+        async function login() {
+            loginFastAPI(loginData)
+        }
+
+        async function loginFastAPI(dict) {
+            const res = await fetch("http://localhost:8000/user/login", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(dict)
+            });
+            const data = await res.json();
+            if (res.ok && data.access_token) {
+                setToken(data.access_token, data.refresh_token || "user");
+                connectWS();
+                return true;
+            } else {
+                console.error("Login failed", data);
+                return false;
+            }
+        }
+
+
+        function connectWS() {
+            if (!access_token) return console.error("token missing");
+            const url = `ws://localhost:8000/ws?token=${encodeURIComponent(access_token)}`;
+            ws = new WebSocket(url);
+
+            ws.onopen = () => appendSystem("WebSocket connecté");
+            ws.onmessage = (ev) => {
+                const d = JSON.parse(ev.data);
+                handleWSMessage(d);
+            };
+            ws.onclose = (ev) => appendSystem("WebSocket fermé: " + ev.reason);
+            ws.onerror = (err) => console.error("WS error", err);
+        }
+
+    </script>
+</footer>
+
+</html>
