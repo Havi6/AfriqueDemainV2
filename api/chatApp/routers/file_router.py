@@ -18,9 +18,7 @@ DIR = {
     "image": os.path.join(BASE_DIR, "image"),
     "audio": os.path.join(BASE_DIR, "audio"),
 }
-#construction des répertoires
-for d in DIR.values():
-    os.makedirs(d, exist_ok=True)
+
 
 #Extentions autorisées
 CATEGORIES = ["audio", "video", "image", "pdf"]
@@ -40,8 +38,12 @@ async def upload_file(
         title: str = Form(...),
         description: str = Form(None),
         db: Session = Depends(get_db),
-        user: models.users_models.User = Depends(get_current_user)
+        #user: models.users_models.User = Depends(get_current_user)
 ):
+    # construction des répertoires
+    for d in DIR.values():
+        os.makedirs(d, exist_ok=True)
+
     content = await file.read()
     meta = ImageMeta(title=title, description=description)
     #recupération de l'extention
@@ -69,23 +71,21 @@ async def upload_file(
         while chunk := await file.read(1024 * 1024):
             f.write(chunk)
 
-    file = FileMeta(filename=title ,uploader=user.username, size=len(content),path= file_path )
+    file = FileMeta(filename=title ,uploader="Havi", size=len(content),path= file_path, description=description )
     db.add(file)
     db.commit()
     db.refresh(file)
 
-    return {
-        "filename":file.filename,
-        "size":len(content),
-        "meta":meta.dict(),
-    }
+    return file
 
 @router.get("/download/{category}/{filename}")
-async def download_file(category: str, filename: str):
-    if category not in CATEGORIES:
-        raise HTTPException(status_code=400, detail="mauvaise catégorie")
+async def download_file(category: str, filename: str, db: Session = Depends(get_db)):
+    file = db.query(FileMeta).filter(FileMeta.filename == filename).first()
 
-    file_path = os.path.join(BASE_DIR, category, filename)
+    if category not in CATEGORIES or not file:
+        raise HTTPException(status_code=400, detail="mauvaise catégorie ou fichier inexistant")
+
+    file_path = file.path
 
     if not os.path.exists(file_path):
         raise HTTPException(status_code=404, detail=f"le fichier {filename} n'a pas été trouvé")

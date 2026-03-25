@@ -31,9 +31,13 @@ async def update_user(user: api.chatApp.models.users_models.User = Depends(get_c
         api.chatApp.models.users_models.User.email == user.email).first()
     if db_user is None:
         raise HTTPException(status_code=404, detail="utilisateur non trouvé")
-    
-    db_user.username = form_data.username if form_data.username is not None else db_user.username
-    db_user.password_hash = hash_password(form_data.password_hash) if form_data.password_hash is not None else db_user.password_hash
+
+    if form_data.username is not None:
+        db_user.username = form_data.username if form_data.username is not None else db_user.username
+
+    if form_data.password_hash is not None:
+        db_user.password_hash = hash_password(form_data.password_hash) if form_data.password_hash is not None else db_user.password_hash
+        
     db.commit()
     db.refresh(db_user)
     return db_user

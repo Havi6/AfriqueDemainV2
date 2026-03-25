@@ -26,8 +26,8 @@ class UserResponse(BaseModel):
     created_at: datetime
     
 class UserUpdate(BaseModel):
-    username: Optional[str]
-    password_hash: Optional[str]
+    username: str = None
+    password_hash: str = None
     
 class RoleUpdate(BaseModel):
     role: Literal["user", "admin", "superadmin"]

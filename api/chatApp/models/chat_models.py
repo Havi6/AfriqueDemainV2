@@ -24,6 +24,7 @@ class FileMeta(Base):
     id = Column(Integer, primary_key=True, index=True)
     filename = Column(String(255), nullable=False)
     uploader = Column(String(80), nullable=False)
+    description = Column(String(512), nullable=True)
     room = Column(String(120), nullable=True)
     recipient = Column(String(80), nullable=True)
     size = Column(Integer, nullable=True)
