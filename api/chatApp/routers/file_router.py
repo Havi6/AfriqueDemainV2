@@ -38,14 +38,13 @@ async def upload_file(
         title: str = Form(...),
         description: str = Form(None),
         db: Session = Depends(get_db),
-        #user: models.users_models.User = Depends(get_current_user)
+        user: models.users_models.User = Depends(get_current_user)
 ):
     # construction des répertoires
     for d in DIR.values():
         os.makedirs(d, exist_ok=True)
 
     content = await file.read()
-    meta = ImageMeta(title=title, description=description)
     #recupération de l'extention
     _, ext = os.path.splitext(file.filename)
     ext = ext.lower()
@@ -71,7 +70,7 @@ async def upload_file(
         while chunk := await file.read(1024 * 1024):
             f.write(chunk)
 
-    file = FileMeta(filename=title ,uploader="Havi", size=len(content),path= file_path, description=description )
+    file = FileMeta(filename=title ,uploader=user.username, size=len(content),path= file_path, description=description )
     db.add(file)
     db.commit()
     db.refresh(file)
