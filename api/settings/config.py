@@ -13,3 +13,4 @@ FILES_UPLOAD_DIR = os.environ.get("FILES_UPLOAD_DIR", os.path.join(BASE_DIR, "up
 # changement de db vers postgres
 #
 # os.environ.get("DATABASE_URL", f"sqlite:///{os.path.join(BASE_DIR, 'app_fastapi.db')}")
+#postgresql://havi:8z3FRxxIDrhayjeyYFn9S86AwsHBWfLZ@dpg-d755f7dactks738q785g-a.oregon-postgres.render.com/afriquedemain
