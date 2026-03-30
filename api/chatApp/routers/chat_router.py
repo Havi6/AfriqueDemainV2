@@ -100,7 +100,7 @@ async def websocket_endpoint(websocket: WebSocket, token: str = Query(...)):
             elif t == "create_room":
                 role = payload.get("role")
                 name = data.get("room")
-                if role not in ["admin", "superuser"]:
+                if role not in ["admin", "superadmin"]:
                     await websocket.send_json({"type":"system","msg":"Permission refusée: admin requis"})
                     continue
                 if not name:
