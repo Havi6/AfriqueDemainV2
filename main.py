@@ -39,3 +39,7 @@ def create_superuser():
         db.close()
 
 create_superuser()
+
+@app.get("/")
+def read_root():
+    return {"message" : "your are connected successfully"}
